@@ -11,7 +11,7 @@ from .logger import Logger
 
 warnings.showwarning = lambda *args, **kwargs: print(chalk.yellow(args[0]))
 
-class ExperimentContext(object):
+class ExperimentContext():
   def __init__(self, separator: str, train_or_test: bool, run_name: str, fields: List[str]):
     self.file_handle = open('./results_' + train_or_test + '_' + run_name, 'a+')
     self.fields = fields
