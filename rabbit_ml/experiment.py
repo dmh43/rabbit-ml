@@ -28,8 +28,8 @@ class Experiment(object):
   def __init__(self, params):
     self.separator = '|'
     self.training = None
-    self.log = Logger()
     self.epoch_num = None
+    self.log = None
     self.params = params
     self.metrics = {}
     self.file_handle = None
@@ -76,6 +76,7 @@ class Experiment(object):
     self._write_details()
     context = ExperimentContext(self.separator, self.train_or_test, self.run_name, fields)
     self.file_handle = context.file_handle
+    self.log = Logger(context.file_handle)
     return context
 
   def test(self, fields):
@@ -83,6 +84,7 @@ class Experiment(object):
     self._write_details()
     context = ExperimentContext(self.separator, self.train_or_test, self.run_name, fields)
     self.file_handle = context.file_handle
+    self.log = Logger(context.file_handle)
     return context
 
   def _write_details(self):
