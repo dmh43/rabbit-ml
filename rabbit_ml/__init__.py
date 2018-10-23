@@ -71,7 +71,7 @@ class Rabbit(ABC):
 
   def _get_cli_args(self, args):
     args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
-    flag_argnames = list(filter(lambda arg: arg['type'] == 'flag', args))
+    flag_argnames = [arg['name'] for arg in filter(lambda arg: arg['type'] == 'flag', args)]
     return getopt.getopt(_.tail(sys.argv),
                          '',
                          flag_argnames + [arg['name'] + '=' for arg in args_with_values])[0]
