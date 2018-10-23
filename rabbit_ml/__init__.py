@@ -53,19 +53,21 @@ class Rabbit(ABC):
       pair = _.find(args, lambda pair: name in pair[0])
       if pair:
         if arg['type'] == 'flag':
-          parsed = '--' + arg['name'] in flags
+          val = '--' + arg['name'] in flags
         else:
-          parsed = arg['type'](pair[1])
-        if arg['for'] == 'path':
-          self.paths = self.paths.set(name, parsed)
-        elif arg['for'] == 'model_params':
-          self.model_params = self.model_params.set(name, parsed)
-        elif arg['for'] == 'train_params':
-          self.train_params = self.train_params.set(name, parsed)
-        elif arg['for'] == 'run_params':
-          self.run_params = self.run_params.set(name, parsed)
-        else:
-          raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
+          val = arg['type'](pair[1])
+      else:
+        val = arg['default']
+      if arg['for'] == 'path':
+        self.paths = self.paths.set(name, val)
+      elif arg['for'] == 'model_params':
+        self.model_params = self.model_params.set(name, val)
+      elif arg['for'] == 'train_params':
+        self.train_params = self.train_params.set(name, val)
+      elif arg['for'] == 'run_params':
+        self.run_params = self.run_params.set(name, val)
+      else:
+        raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
 
   def _get_cli_args(self, args):
     args_with_values = filter(lambda arg: arg['type'] != 'flag', args)
