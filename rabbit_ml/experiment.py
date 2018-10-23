@@ -55,7 +55,7 @@ class Experiment(object):
   def model_name(self):
     param_names = sorted([key for key in self.params.keys() if key not in ['ablation', 'load_model']])
     param_strings = [name + '=' + str(self.params[name]) for name in param_names]
-    hash_string = hashlib.sha256(str.encode('_'.join(param_strings))).hexdigest()
+    hash_string = hashlib.md5(str.encode('_'.join(param_strings))).hexdigest()
     return 'model_' + hash_string
 
   @property

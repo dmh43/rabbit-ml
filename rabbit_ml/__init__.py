@@ -70,8 +70,8 @@ class Rabbit(ABC):
         raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
 
   def _get_cli_args(self, args):
-    args_with_values = filter(lambda arg: arg['type'] != 'flag', args)
-    flag_argnames = filter(lambda arg: arg['type'] == 'flag', args)
+    args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
+    flag_argnames = list(filter(lambda arg: arg['type'] == 'flag', args))
     return getopt.getopt(_.tail(sys.argv),
                          '',
                          flag_argnames + [arg['name'] + '=' for arg in args_with_values])[0]
