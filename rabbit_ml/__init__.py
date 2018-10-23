@@ -44,13 +44,13 @@ class Rabbit(ABC):
       env = dotenv_values(find_dotenv())
     else:
       env = dotenv_values(env_path)
-    args = self._get_cli_args(args)
+    cli_args = self._get_cli_args(args)
     flags = [_.head(arg) for arg in args]
     self.train_params, self.run_params, self.model_params = m(), m(), m()
     self.paths = m(**{var[0].lower()[:-5]: var[1] for var in env.items() if '_PATH' in var[0]})
     for arg in args:
       name = arg['name']
-      pair = _.find(args, lambda pair: name in pair[0])
+      pair = _.find(cli_args, lambda pair: name in pair[0])
       if pair:
         if arg['type'] == 'flag':
           val = '--' + arg['name'] in flags
