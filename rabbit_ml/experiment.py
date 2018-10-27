@@ -53,8 +53,9 @@ class Experiment(object):
 
   @property
   def model_name(self):
+    get_param_text = lambda name: str(self.params[name].__name__) if hasattr(self.params[name], '__name__') else str(self.params[name])
     param_names = sorted([key for key in self.params.keys() if key not in ['ablation', 'load_model']])
-    param_strings = [name + '=' + str(self.params[name]) for name in param_names]
+    param_strings = [name + '=' + get_param_text(name) for name in param_names]
     hash_string = hashlib.md5(str.encode('_'.join(param_strings))).hexdigest()
     return 'model_' + hash_string
 
