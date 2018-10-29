@@ -2,6 +2,7 @@ from typing import List
 import hashlib
 import os
 import warnings
+from time import time
 
 import pydash as _
 from git import Repo
@@ -16,13 +17,17 @@ class ExperimentContext():
     self.file_handle = open('./results_' + train_or_test + '_' + run_name, 'a+')
     self.fields = fields
     self.separator = separator
+    self.time_start = None
+    self.time_end = None
 
   def __enter__(self):
     self.file_handle.write(self.separator.join(sorted(self.fields) + ['batch', 'epoch']) + '\n')
+    self.time_start = time()
     return self.file_handle
 
   def __exit__(self, *args):
     self.file_handle.close()
+    self.time_end = time()
 
 class Experiment(object):
   def __init__(self, params):
