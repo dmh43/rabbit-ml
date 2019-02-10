@@ -75,6 +75,10 @@ class Experiment(object):
     self.file_handle.write(self.separator.join(vals) + '\n')
     self.file_handle.flush()
 
+  def record_note(self, note):
+    self.file_handle.write(note + '\n')
+    self.file_handle.flush()
+
   def update_epoch(self, epoch_num):
     self.epoch_num = epoch_num
 
