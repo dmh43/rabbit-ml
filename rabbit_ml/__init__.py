@@ -24,7 +24,6 @@ from .arg_parsers import *
 #          {'name': 'load_model'                 , 'for': 'run_params', 'type': 'flag'},
 #          {'name': 'use_adaptive_softmax'       , 'for': 'run_params', 'type': 'flag'},
 #          {'name': 'use_hardcoded_cutoffs'      , 'for': 'run_params', 'type': 'flag'}]
-
 def get_cli_args(args):
   args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
   flag_argnames = [arg['name'] for arg in filter(lambda arg: arg['type'] == 'flag', args)]
@@ -54,7 +53,9 @@ def get_cli_args(args):
       run_params = run_params.set(name, val)
     else:
       raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
-
+  return m(train_params=train_params,
+           run_params=run_params,
+           model_params=model_params)
 def run():
   def _run_wrapper(func):
     import ipdb
