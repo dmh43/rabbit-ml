@@ -1,11 +1,10 @@
-from abc import abstractmethod, ABC
-
 import getopt
 import sys
 
-from dotenv import dotenv_values, find_dotenv
 from pyrsistent import m
 import pydash as _
+
+from .arg_parsers import *
 
 # format for `args`:
 # args =  [{'name': 'batch_size'                 , 'for': 'train_params', 'type': int},
@@ -26,6 +25,36 @@ import pydash as _
 #          {'name': 'use_adaptive_softmax'       , 'for': 'run_params', 'type': 'flag'},
 #          {'name': 'use_hardcoded_cutoffs'      , 'for': 'run_params', 'type': 'flag'}]
 
+def get_cli_args(args):
+  args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
+  flag_argnames = [arg['name'] for arg in filter(lambda arg: arg['type'] == 'flag', args)]
+  cli_args = getopt.getopt(_.tail(sys.argv),
+                           '',
+                           flag_argnames + [arg['name'] + '=' for arg in args_with_values])[0]
+  flags = [_.head(arg) for arg in cli_args]
+  train_params, run_params, model_params = m(), m(), m()
+  paths = m()
+  for arg in args:
+    name = arg['name']
+    pair = _.find(cli_args, lambda pair: name in pair[0])
+    if pair:
+      if arg['type'] == 'flag':
+        val = '--' + arg['name'] in flags
+      else:
+        val = arg['type'](pair[1])
+    else:
+      val = arg['default']
+    if arg['for'] == 'path':
+      paths = paths.set(name, val)
+    elif arg['for'] == 'model_params':
+      model_params = model_params.set(name, val)
+    elif arg['for'] == 'train_params':
+      train_params = train_params.set(name, val)
+    elif arg['for'] == 'run_params':
+      run_params = run_params.set(name, val)
+    else:
+      raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
+
 def run():
   def _run_wrapper(func):
     import ipdb
@@ -37,45 +66,3 @@ def run():
       extype, value, tb = sys.exc_info()
       traceback.print_exc()
       ipdb.post_mortem(tb)
-
-class Rabbit(ABC):
-  def __init__(self, args, env_path=None):
-    if env_path is None:
-      env = dotenv_values(find_dotenv())
-    else:
-      env = dotenv_values(env_path)
-    cli_args = self._get_cli_args(args)
-    flags = [_.head(arg) for arg in cli_args]
-    self.train_params, self.run_params, self.model_params = m(), m(), m()
-    self.paths = m(**{var[0].lower()[:-5]: var[1] for var in env.items() if '_PATH' in var[0]})
-    for arg in args:
-      name = arg['name']
-      pair = _.find(cli_args, lambda pair: name in pair[0])
-      if pair:
-        if arg['type'] == 'flag':
-          val = '--' + arg['name'] in flags
-        else:
-          val = arg['type'](pair[1])
-      else:
-        val = arg['default']
-      if arg['for'] == 'path':
-        self.paths = self.paths.set(name, val)
-      elif arg['for'] == 'model_params':
-        self.model_params = self.model_params.set(name, val)
-      elif arg['for'] == 'train_params':
-        self.train_params = self.train_params.set(name, val)
-      elif arg['for'] == 'run_params':
-        self.run_params = self.run_params.set(name, val)
-      else:
-        raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
-
-  def _get_cli_args(self, args):
-    args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
-    flag_argnames = [arg['name'] for arg in filter(lambda arg: arg['type'] == 'flag', args)]
-    return getopt.getopt(_.tail(sys.argv),
-                         '',
-                         flag_argnames + [arg['name'] + '=' for arg in args_with_values])[0]
-
-  @abstractmethod
-  def run(self):
-    pass
