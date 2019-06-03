@@ -54,9 +54,9 @@ def get_cli_args(args):
       run_params = run_params.set(name, val)
     else:
       raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
-  return m(train_params=train_params,
-           run_params=run_params,
-           model_params=model_params)
+  return m(train=train_params,
+           run=run_params,
+           model=model_params)
 
 def run():
   def _run_wrapper(func):
