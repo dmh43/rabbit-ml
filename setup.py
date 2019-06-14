@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="rabbit_ml",
-    version="0.0.1",
+    version="0.0.2",
     url="none",
 
     author="Dany Haddad",
