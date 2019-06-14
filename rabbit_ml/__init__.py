@@ -25,7 +25,15 @@ from .arg_parsers import *
 #          {'name': 'use_adaptive_softmax'       , 'for': 'run_params', 'type': 'flag'},
 #          {'name': 'use_hardcoded_cutoffs'      , 'for': 'run_params', 'type': 'flag'}]
 
+def _flip_dont(name):
+  if name[:5] == 'dont_': return name[5:]
+  else: return 'dont_' + name
+
 def get_cli_args(args):
+  args = args + [_.defaults({'name': _flip_dont(arg['name']),
+                             'default': not arg['default']},
+                            arg)
+                 for arg in args if arg['type'] == 'flag']
   args_with_values = list(filter(lambda arg: arg['type'] != 'flag', args))
   flag_argnames = [arg['name'] for arg in filter(lambda arg: arg['type'] == 'flag', args)]
   cli_args = getopt.getopt(_.tail(sys.argv),
