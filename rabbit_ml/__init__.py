@@ -49,14 +49,21 @@ def get_cli_args(args):
     elif arg['for'] == 'model_params':
       model_params[name] = val
       if arg['type'] == 'flag':
-        model_params['dont_' + name] = not val
+        if name[:5] == 'dont_':
+          model_params[name[5:]] = not val
+        else:
+          model_params['dont_' + name] = not val
     elif arg['for'] == 'train_params':
       train_params[name] = val
-      if arg['type'] == 'flag':
+      if name[:5] == 'dont_':
+        train_params[name[5:]] = not val
+      else:
         train_params['dont_' + name] = not val
     elif arg['for'] == 'run_params':
       run_params[name] = val
-      if arg['type'] == 'flag':
+      if name[:5] == 'dont_':
+        run_params[name[5:]] = not val
+      else:
         run_params['dont_' + name] = not val
     else:
       raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
