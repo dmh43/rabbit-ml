@@ -1,7 +1,7 @@
 import getopt
 import sys
 
-from pyrsistent import freeze
+from pyrsistent import m
 import pydash as _
 
 from .arg_parsers import *
@@ -32,8 +32,8 @@ def get_cli_args(args):
                            '',
                            flag_argnames + [arg['name'] + '=' for arg in args_with_values])[0]
   flags = [_.head(arg) for arg in cli_args]
-  train_params, run_params, model_params = {}, {}, {}
-  paths = {}
+  train_params, run_params, model_params = m(), m(), m()
+  paths = m()
   for arg in args:
     name = arg['name']
     pair = _.find(cli_args, lambda pair: name in pair[0])
@@ -45,24 +45,18 @@ def get_cli_args(args):
     else:
       val = arg['default']
     if arg['for'] == 'path':
-      paths[name] = val
+      paths = paths.set(name, val)
     elif arg['for'] == 'model_params':
-      model_params[name] = val
-      if arg['type'] == 'flag':
-        model_params['dont_' + name] = not val
+      model_params = model_params.set(name, val)
     elif arg['for'] == 'train_params':
-      train_params[name] = val
-      if arg['type'] == 'flag':
-        train_params['dont_' + name] = not val
+      train_params = train_params.set(name, val)
     elif arg['for'] == 'run_params':
-      run_params[name] = val
-      if arg['type'] == 'flag':
-        run_params['dont_' + name] = not val
+      run_params = run_params.set(name, val)
     else:
       raise ValueError('`args_with_values` contains unsupported param group ' + arg['for'])
-  return freeze(dict(train=train_params,
-                     run=run_params,
-                     model=model_params))
+  return m(train=train_params,
+           run=run_params,
+           model=model_params)
 
 def run():
   def _run_wrapper(func):
