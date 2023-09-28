@@ -1,4 +1,4 @@
-pydash==4.5.0
+pydash==6.0.0
 pychalk==2.0.0
 toolz==0.9.0
 ipdb==0.11
